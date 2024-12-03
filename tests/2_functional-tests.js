@@ -1,76 +1,78 @@
-const chaiHttp = require('chai-http');
-const chai = require('chai');
+const chaiHttp = require("chai-http");
+const chai = require("chai");
 let assert = chai.assert;
-const server = require('../server');
+const server = require("../server.js");
 
 chai.use(chaiHttp);
 
-suite('Functional Tests', function(){
+suite("Functional Tests", function () {
+  // Convert a valid input such as 10L: GET request to /api/convert.
 
-    // Convertir una entrada válida, tales como 10L: GET Solicitud de /api/convert
-    test('Convertir una entrada válida, 10L', function(done){
-        chai.request(server)
-            .get('/api/convert')
-            .query({input: '10L'})
-            .end(function(err, res){
-                assert.equal(res.status, 200);
-                assert.equal(res.body.initNum, 10);
-                assert.equal(res.body.initUnit, 'L');
-                assert.approximately(res.body.returnNum, 2.6417, 0.0001); // Esperado en mi
-                assert.equal(res.body.returnUnit, 'mi');
-                done();
-            });
-    });
+  test("Convert a valid input such as 10L: GET request to /api/convert.", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .get("/api/convert?input=10L")
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.string, "10 liters converts to 2.64172 gallons");
+        done();
+      });
+  });
 
-    // Convertir una entrada inválida, tales como 32g: GET Solicitud de /api/convert
-    test('Convertir una entrada inválida, 32g', function(done){
-        chai.request(server)
-            .get('/api/convert')
-            .query({input: '32g'})
-            .end(function(err, res){
-                assert.equal(res.status, 200);
-                assert.equal(res.body.error, 'invalid unit');
-                done();
-            });
-    });
+  // Convert an invalid input such as 32g: GET request to /api/convert.
 
-    // Convertir un número no válido, tales como 3/7.2/4kg: GET Solicitud de /api/convert
-    test('Convertir un número no válido, 3/7.2/4kg', function(done){
-        chai.request(server)
-            .get('/api/convert')
-            .query({input: '3/7.2/4kg'})
-            .end(function(err, res){
-                assert.equal(res.status, 200);
-                assert.equal(res.body.error, 'invalid number');
-                done();
-            });
-    });
+  test("Convert an invalid input such as 32g: GET request to /api/convert.", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .get("/api/convert?input=32g")
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.error, "invalid unit");
+        done();
+      });
+  });
 
-    // Convertir un número no válido Y unidad, tales como 3/7.2/4kilomegagram: GET Solicitud de /api/convert
-    test('Convertir un número no válido y unidad, 3/7.2/4kilomegagram', function(done){
-        chai.request(server)
-            .get('/api/convert')
-            .query({input: '3/7.2/4kilomegagram'})
-            .end(function(err, res){
-                assert.equal(res.status, 200);
-                assert.equal(res.body.error, 'invalid unit');
-                done();
-            });
-    });
+  // Convert an invalid number such as 3/7.2/4kg: GET request to /api/convert.
 
-    // Convertir sin número, tales como kg: GET Solicitud de /api/convert
-    test('Convertir sin número, kg', function(done){
-        chai.request(server)
-            .get('/api/convert')
-            .query({input: 'kg'})
-            .end(function(err, res){
-                assert.equal(res.status, 200);
-                assert.equal(res.body.initNum, 1); // Predeterminado a 1
-                assert.equal(res.body.initUnit, 'kg');
-                assert.approximately(res.body.returnNum, 2.20462, 0.0001); // Esperado en lbs
-                assert.equal(res.body.returnUnit, 'lbs');
-                done();
-            });
-    });
+  test("Convert an invalid number such as 3/7.2/4kg: GET request to /api/convert.", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .get("/api/convert?input=3/7.2/4kg")
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.error, "invalid number");
+        done();
+      });
+  });
 
+  // Convert an invalid number AND unit such as 3/7.2/4kilomegagram: GET request to /api/convert.
+
+  test("Convert an invalid number AND unit such as 3/7.2/4kilomegagram: GET request to /api/convert.", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .get("/api/convert?input=3/7.2/4kilomegagram")
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.error, "invalid number and unit");
+        done();
+      });
+  });
+
+  // Convert with no number such as kg: GET request to /api/convert.
+
+  test("Convert with no number such as kg: GET request to /api/convert.", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .get("/api/convert?input=kg")
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.string, "1 kilogram converts to 2.20462 pounds");
+        done();
+      });
+  });
 });

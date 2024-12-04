@@ -6,54 +6,32 @@ const ConvertHandler = require("../controllers/convertHandler.js");
 module.exports = function (app) {
   let convertHandler = new ConvertHandler();
 
-  app.get("/api/convert", function (req, res) {
-    const input = req.query.input;
-    inputResponse(res, input, convertHandler);
-  });
-
-  app.post("/api/convert", function (req, res) {
-    const input = req.body.input;
-    inputResponse(res, input, convertHandler);
-  });
-};
-
-function inputResponse(res, input, convertHandler) {
-  if (input === undefined) {
-    res.json({ error: "query string is not valid" });
-  } else {
-    // la funcion isValid setea el numero y/o la unidad y en función de si existen valores para el numero o unidad se muestra mensajes de error respectivos
-    convertHandler.isValid(input);
-
-    const initNum = convertHandler.numero;
-    const initUnit = convertHandler.unit;
-
-    if (initNum === null && initUnit !== null) {
-      res.json({ error: "invalid number" });
-      return;
+  app.route("/api/convert").get((req, res) => {
+    const { input } = req.query;
+    if (!input) {
+      return res.send("invalid input");
     }
-    if (initNum !== null && initUnit === null) {
-      res.json({ error: "invalid unit" });
-      return;
+    const initNum = convertHandler.getNum(input);
+    const initUnit = convertHandler.getUnit(input);
+
+    if (initNum === "invalid number" && initUnit === "invalid unit") {
+      return res.send("invalid number and unit");
     }
-    if (initNum === null && initUnit === null) {
-      res.json({ error: "invalid number and unit" });
-      return;
+    if (initNum === "invalid number") {
+      return res.send("invalid number");
+    }
+    if (initUnit === "invalid unit") {
+      return res.send("invalid unit");
     }
 
     const returnUnit = convertHandler.getReturnUnit(initUnit);
     const returnNum = convertHandler.convert(initNum, initUnit);
     const string = convertHandler.getString(
-      +initNum,
+      initNum,
       initUnit,
-      +returnNum,
+      returnNum,
       returnUnit
     );
-    res.status(200).json({
-      initNum: +initNum,
-      initUnit: initUnit === "l" ? "L" : initUnit,
-      returnNum,
-      returnUnit: returnUnit === "l" ? "L" : returnUnit,
-      string,
-    });
-  }
-}
+    res.json({ initNum, initUnit, returnNum, returnUnit, string });
+  });
+};

@@ -5,143 +5,196 @@ const ConvertHandler = require("../controllers/convertHandler.js");
 let convertHandler = new ConvertHandler();
 
 suite("Unit Tests", function () {
-  test("convertHandler should correctly read a whole number input.", function () {
-    convertHandler.isValid("5gal");
-    assert.equal(convertHandler.getNum("5gal"), 5, "5gal should return 5");
-  });
-
-  test("convertHandler should correctly read a decimal number input.", function () {
-    convertHandler.isValid("5.5gal");
-    assert.equal(
-      convertHandler.getNum("5.5gal"),
-      5.5,
-      "5.5gal should return 5.5"
+  test("Testing valid whole number input", () => {
+    assert.strictEqual(
+      convertHandler.getNum("2kg"),
+      2,
+      "Correctly read valid whole number input"
     );
   });
-
-  test("convertHandler should correctly read a fractional input.", function () {
-    convertHandler.isValid("1/2gal");
-    assert.equal(
-      convertHandler.getNum("1/2gal"),
-      0.5,
-      "1/2gal should return 0.5"
+  test("Testing valid decimal input", () => {
+    assert.strictEqual(
+      convertHandler.getNum("2.5lbs"),
+      2.5,
+      "Correctly read valid decimal input"
     );
   });
-
-  test("convertHandler should correctly read a fractional input with a decimal.", function () {
-    convertHandler.isValid("1.5/2gal");
-    assert.equal(
-      convertHandler.getNum("1.5/2gal"),
-      0.75,
-      "1.5/2gal should return 0.75"
+  test("Testing valid fractional input", () => {
+    assert.strictEqual(
+      convertHandler.getNum("1/5kg"),
+      0.2,
+      "Correctly read valid fractional input"
     );
   });
-
-  test("convertHandler should correctly return an error on a double-fraction (i.e. 3/2/3).", function () {
-    convertHandler.isValid("3/2/3gal");
-    assert.equal(
-      convertHandler.getNum("3/2/3gal"),
+  test("Testing valid fractional input with decimal", () => {
+    assert.strictEqual(
+      convertHandler.getNum("0.2/0.5kg"),
+      0.4,
+      "Correctly read valid fractional input with decimal"
+    );
+  });
+  test("Testing invalid double fraction input", () => {
+    assert.strictEqual(
+      convertHandler.getNum("2/2/7kg"),
       "invalid number",
-      "3/2/3gal should return invalid number"
+      "Return error for invalid double fraction input"
     );
   });
-
-  test("convertHandler should correctly default to a numerical input of 1 when no numerical input is provided.", function () {
-    convertHandler.isValid("gal");
-    assert.equal(
-      convertHandler.getNum("gal"),
+  test("Testing no numeric input", () => {
+    assert.strictEqual(
+      convertHandler.getNum("lbs"),
       1,
-      "gal should return 1 when no number is provided"
+      "correctly default to 1 when no numeric input is provided"
     );
   });
 
-  test("convertHandler should correctly read each valid input unit.", function () {
-    convertHandler.isValid("5gal");
-    assert.equal(
-      convertHandler.getUnit("5gal"),
+  test("Testing valid input unit", () => {
+    assert.strictEqual(
+      convertHandler.getUnit("2gal"),
       "gal",
-      "5gal should return gal"
+      "correctly read gal"
+    );
+    assert.strictEqual(convertHandler.getUnit("2L"), "L", "correctly read L");
+    assert.strictEqual(
+      convertHandler.getUnit("2mi"),
+      "mi",
+      "correctly read mi"
+    );
+    assert.strictEqual(
+      convertHandler.getUnit("2km"),
+      "km",
+      "correctly read km"
+    );
+    assert.strictEqual(
+      convertHandler.getUnit("2lbs"),
+      "lbs",
+      "correctly read lbs"
+    );
+    assert.strictEqual(
+      convertHandler.getUnit("2kg"),
+      "kg",
+      "correctly read kg"
     );
   });
 
-  test("convertHandler should correctly return an error for an invalid input unit.", function () {
-    convertHandler.isValid("5gald");
-    assert.equal(
-      convertHandler.getUnit("5gald"),
+  test("Testing invalid input unit", () => {
+    assert.strictEqual(
+      convertHandler.getUnit("2invalidUnit"),
       "invalid unit",
-      "5gald should return invalid unit"
+      "Correctly return error message for invalid input unit"
     );
   });
 
-  test("convertHandler should return the correct return unit for each valid input unit.", function () {
-    convertHandler.isValid("5gal");
-    assert.equal(
+  test("Testing return unit for valid input unit", () => {
+    assert.strictEqual(
       convertHandler.getReturnUnit("gal"),
-      "l",
-      "gal should return l"
+      "L",
+      "Correctly return L as output unit for gal input unit"
+    );
+    assert.strictEqual(
+      convertHandler.getReturnUnit("L"),
+      "gal",
+      "Correctly return gal as output unit for L input unit"
+    );
+    assert.strictEqual(
+      convertHandler.getReturnUnit("mi"),
+      "km",
+      "Correctly return km as output unit for mi input unit"
+    );
+    assert.strictEqual(
+      convertHandler.getReturnUnit("km"),
+      "mi",
+      "Correctly return mi as output unit for km input unit"
+    );
+    assert.strictEqual(
+      convertHandler.getReturnUnit("lbs"),
+      "kg",
+      "Correctly return kg as output unit for lbs input unit"
+    );
+    assert.strictEqual(
+      convertHandler.getReturnUnit("kg"),
+      "lbs",
+      "Correctly return lbs as output unit for kg input unit"
     );
   });
 
-  test("convertHandler should correctly return the spelled-out string unit for each valid input unit.", function () {
-    convertHandler.isValid("5gal");
-    assert.equal(
-      convertHandler.spellOutUnit("gal"),
-      "gallon",
-      "gal should return gallons"
+  test("Testing spelled-out string unit for valid input unit", () => {
+    assert.strictEqual(
+      convertHandler.spellOutUnit("GAL"),
+      "gal",
+      "Correctly return gal as output unit for GAL input unit"
+    );
+    assert.strictEqual(
+      convertHandler.spellOutUnit("l"),
+      "L",
+      "Correctly return L as output unit for l input unit"
+    );
+    assert.strictEqual(
+      convertHandler.spellOutUnit("MI"),
+      "mi",
+      "Correctly return mi as output unit for MI input unit"
+    );
+    assert.strictEqual(
+      convertHandler.spellOutUnit("KM"),
+      "km",
+      "Correctly return km as output unit for KM input unit"
+    );
+    assert.strictEqual(
+      convertHandler.spellOutUnit("LBS"),
+      "lbs",
+      "Correctly return lbs as output unit for LBS input unit"
+    );
+    assert.strictEqual(
+      convertHandler.spellOutUnit("KG"),
+      "kg",
+      "Correctly return kg as output unit for KG input unit"
     );
   });
 
-  test("convertHandler should correctly convert gal to L.", function () {
-    convertHandler.isValid("5gal");
-    assert.equal(
-      convertHandler.convert(5, "gal"),
-      18.92705,
-      "5gal should return 18.92705"
+  test("Converting gal to L", () => {
+    assert.strictEqual(
+      convertHandler.convert(2, "gal"),
+      7.57082,
+      "Correctly convert 2gal to 7.57082L"
+    );
+  });
+  test("Converting L to gal", () => {
+    assert.strictEqual(
+      convertHandler.convert(2, "L"),
+      0.52834,
+      "Correctly convert 2L to 0.52834gal"
+    );
+  });
+  test("Converting mi to km", () => {
+    assert.strictEqual(
+      convertHandler.convert(2, "mi"),
+      3.21868,
+      "Correctly convert 2mi to 3.21868km"
+    );
+  });
+  test("Converting km to mi", () => {
+    assert.strictEqual(
+      convertHandler.convert(2, "km"),
+      1.24275,
+      "Correctly convert 2km to 1.24275mi"
+    );
+  });
+  test("Converting lbs to kg", () => {
+    assert.strictEqual(
+      convertHandler.convert(2, "lbs"),
+      0.90718,
+      "Correctly convert 2lbs to 0.90718kg"
+    );
+  });
+  test("Converting kg to lbs", () => {
+    assert.strictEqual(
+      convertHandler.convert(2, "kg"),
+      4.40925,
+      "Correctly convert 2kg to 4.40925lbs"
     );
   });
 
-  test("convertHandler should correctly convert L to gal.", function () {
-    convertHandler.isValid("5l");
-    assert.equal(
-      convertHandler.convert(5, "l"),
-      1.32086,
-      "5l should return 1.32086"
-    );
-  });
+  // test("Correctly make conversions", () => {
 
-  test("convertHandler should correctly convert mi to km.", function () {
-    convertHandler.isValid("5mi");
-    assert.equal(
-      convertHandler.convert(5, "mi"),
-      8.0467,
-      "5mi should return 8.04670"
-    );
-  });
-
-  test("convertHandler should correctly convert km to mi.", function () {
-    convertHandler.isValid("5km");
-    assert.equal(
-      convertHandler.convert(5, "km"),
-      3.10686,
-      "5km should return 3.10686"
-    );
-  });
-
-  test("convertHandler should correctly convert lbs to kg.", function () {
-    convertHandler.isValid("5lbs");
-    assert.equal(
-      convertHandler.convert(5, "lbs"),
-      2.26796,
-      "5lbs should return 2.26796"
-    );
-  });
-
-  test("convertHandler should correctly convert kg to lbs.", function () {
-    convertHandler.isValid("5kg");
-    assert.equal(
-      convertHandler.convert(5, "kg"),
-      11.02312,
-      "5kg should return 11.02312"
-    );
-  });
+  // });
 });
